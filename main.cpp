@@ -2,8 +2,11 @@
 
 using namespace std;
 
-float windowWidth  = 800;
-float windowHeight = 600;
+int windowWidth  = 800;
+int windowHeight = 600;
+int mouseXPos = -1;
+
+void *defaultFont = GLUT_BITMAP_TIMES_ROMAN_10;
 
 class UI {
 private:
@@ -19,19 +22,17 @@ public:
 		glColor3f(0.3, 0.3, 0.3);
 		glLineWidth(10.0);
 		glBegin(GL_LINES);
-		glVertex2f(0, 90);
-		glVertex2f(100, 90);	
-		glEnd();
-		glLineWidth(5.0);
-		glBegin(GL_LINES);
-		glVertex2f(0, 10);
-		glVertex2f(100, 10);
+            glVertex2f(0, 0.9);
+            glVertex2f(1.0, 0.9);
 		glEnd();
     }
 };
 
-void WindowDisplay() {
+UI ui;
+
+void DisplayScene() {
     glClear(GL_COLOR_BUFFER_BIT);
+    // glRotatef(1, 0.0f, 1.0f, 0.0f);
 
    glBegin(GL_TRIANGLES);          // Each set of 3 vertices form a triangle
       glColor3f(0.0f, 0.0f, 1.0f); // Blue
@@ -46,7 +47,9 @@ void WindowDisplay() {
       glColor3f(0.0f, 0.0f, 1.0f); // Blue
       glVertex2f(0.6f, -0.9f);
    glEnd();
+   ui.drawHUD();
 
+    // Смена буферов для отрисовки анимации
     glutSwapBuffers();
 }
 
@@ -62,10 +65,49 @@ void WindowResize(GLsizei  w, GLsizei  h) { // GLsizei - non-negative integer
 
     if (w >= h) {
         // If larger width
-        glOrtho(-1.0 * aspectRatio, 1.0 * aspectRatio, -1.0, 1.0, 0.0, 1.0);
+        glOrtho(-1.0 * aspectRatio, 1.0 * aspectRatio, -1.0, 1.0, -1.0, 1.0);
     } else {
         // If larger height
-        glOrtho(-1.0, 1.0, -1.0 / aspectRatio, 1.0 / aspectRatio, 0.0, 1.0);
+        glOrtho(-1.0, 1.0, -1.0 / aspectRatio, 1.0 / aspectRatio, -1.0, 1.0);
+    }
+}
+
+void DisplayText(GLfloat x, GLfloat y, void *font, const char *str) {
+    // Отключим тест Z-буффера, т.к. текст не рисуется, если его что-то заграждает
+    glDisable(GL_DEPTH_TEST);
+
+    glColor3f(1.0, 0.0, 1.0);
+    glRasterPos2f(x, y);
+    glutBitmapString(font, (const unsigned char *)str);
+    // glutStrokeString(GLUT_STROKE_ROMAN, (const unsigned char *)str);
+// }
+}
+
+void ProcessKeyPress(unsigned char key, int x, int y) {
+    switch (key)
+    {
+    // Esc
+    case 27:
+        // TODO: "Are you sure you want to exit" func
+        exit(EXIT_SUCCESS);
+        break;
+    // Spacebar
+    case 32:
+        // TODO: Space key for clicking
+        DisplayText(0.3f, -0.4f, defaultFont, "You did it!");
+        break;
+    }
+}
+
+void ProcessMousePress(int button, int state, int x, int y) {
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        glRotatef(10, 0.0f, 1.0f, 0.0f);
+        DisplayText(0.3f, -0.4f, defaultFont, "You did it!");
+        // // TODO: add Y position
+        // // Reset mouse coords when LMB is released
+        // if (state == GLUT_UP)
+        //     mouseXPos = -1;
+        // else mouseXPos = x;
     }
 }
 
@@ -76,14 +118,21 @@ int main(int argc, char **argv) {
 
     // Создание окна
 	glutInitWindowPosition(100, 100);
-	glutInitWindowSize(800, 600);
+	glutInitWindowSize(windowWidth, windowHeight);
 	glutCreateWindow("Test Window");
     // glutFullScreen();
 
-    // Регистрация обратных вызовов
-    glutDisplayFunc(WindowDisplay);
+    // Отображение
+    glutDisplayFunc(DisplayScene);
     // Изменение размера окна
     glutReshapeFunc(WindowResize);
+    // Программа в режиме ожидания
+    glutIdleFunc(DisplayScene);
+
+    // Обработка нажатия клавиш
+    glutKeyboardFunc(ProcessKeyPress);
+    // Обработка мыши
+    glutMouseFunc(ProcessMousePress);
 
     // Основной цикл GLUT
     glutMainLoop();
