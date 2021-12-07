@@ -8,6 +8,10 @@ int windowHeight = 600;
 
 void *defaultFont = GLUT_BITMAP_HELVETICA_18;
 
+GLfloat clrCream[]= {0.99, 0.964, 0.929};
+GLfloat clrAqua[]= {0.407, 0.53, 0.53};
+GLfloat clrGreen[]= {0.713, 0.843, 0.658};
+
 class UI {
 public:
     int clicks = 0;
@@ -26,7 +30,7 @@ public:
     void DrawHUD() {
         // Lines
 
-        glColor3f(0.3, 0.3, 0.3);
+        glColor3fv(clrCream);
         glLineWidth(10.0);
         glBegin(GL_LINES);
             glVertex2f(0, 90);
@@ -84,7 +88,7 @@ public:
     }
 
     void drawPause() {
-        DisplayText(27, 50, 1.0, 0.0, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, "Are you sure you want to exit?");
+        DisplayText(27, 50, 1.0, 0.0, 0.0, GLUT_BITMAP_9_BY_15, "ARE YOU SURE YOU WANT TO EXIT?");
     }
 };
 
@@ -129,8 +133,8 @@ public:
 GameDirector director;
 
 void DisplayScene() {
+    glClearColor(0.407, 0.53, 0.53, 1.0); // Основной цвет фона
     glClear(GL_COLOR_BUFFER_BIT);
-    glClearColor(0.07, 0.13, 0.17, 1.0); // Основной цвет фона
 
     switch (director.gameState)
     {
@@ -178,7 +182,7 @@ void ProcessKeyPress(unsigned char key, int x, int y) {
     {
     // Esc
     case 27:
-        if (director.gameState == 2) // Если игра
+        if (director.gameState == 2)
             director.gameState = 3;
         else if (director.gameState == 3)
             director.gameState = 2;
@@ -213,16 +217,16 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition(400, 100);
 	glutInitWindowSize(windowWidth, windowHeight);
 	glutCreateWindow("Mouse Clicker");
+    // glutFullScreen();
 
     glOrtho(0.0, 100, 100, 0, -1.0, 1.0);
-    // glutFullScreen();
 
     // Отображение
     glutDisplayFunc(DisplayScene);
+    glutIdleFunc(DisplayScene);
     // Изменение размера окна
     glutReshapeFunc(WindowResize);
-    // Программа в режиме ожидания
-    glutIdleFunc(DisplayScene);
+
     // Режим прозрачности
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
