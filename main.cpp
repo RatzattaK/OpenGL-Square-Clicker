@@ -99,17 +99,6 @@ UpgradeButton btnAutoClicks(10, 50, 20, 35, 8);
 
 class UI {
 public:
-    // const char *numericChar;
-
-    // void DisplayText(float _x, float _y, const GLfloat *v, void *font, const char *_str) {
-    //     glColor3fv(v);
-    //     glRasterPos2f(_x, _y);
-    //     int len, i;
-    //     len = (int)strlen(_str);
-    //     for (i = 0; i < len; i++)
-    //         glutBitmapCharacter(font, _str[i]);
-    // }
-
     void DrawHUD() {
         // Lines
         glPushMatrix();
@@ -126,20 +115,17 @@ public:
             glVertex2f(100, 10);
         glEnd();
         glPopMatrix();
-        // drawLevel();
+
         btnAutoClicks.Draw();
         DisplayClickCount();
+        DisplayClicksPerSec();
     }
 
-    // void drawLevel() // отрисовка номера уровня
-    // {
-    //     stringstream temp_str;
-    //     temp_str << (stage);
-    //     string str = temp_str.str();
-    //     numericChar = str.c_str();
-    //     DisplayText(5, 7, 1.0, 1.0, 1.0, GLUT_BITMAP_TIMES_ROMAN_24, "CURRENT LEVEL:");
-    //     DisplayText(32, 7, 1.0, 0.0, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, numericChar);
-    // }
+    void DisplayClicksPerSec() // отрисовка номера уровня
+    {
+        DisplayText(5, 7, clrWhite, defaultFont, "PASSIVE CLICKS:");
+        DisplayText(35, 7, clrGreen, defaultFont, ConvertToChar(clicks.perSec));
+    }
 
     void drawDarkOverlay() {
         glColor4f(0.0, 0.0, 0.0, 0.4);
