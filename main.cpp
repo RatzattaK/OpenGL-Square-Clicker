@@ -133,10 +133,15 @@ AutoClicksButton btnAutoClicks(40, 50, 20, 35, 8);
 
 class ClickPowerButton : public UpgradeButton {
 public:
-    // float multiplier = 1.09;
+    float multiplier = 1.12;
     void Display() {
-        this->Draw();
-        DisplayText(x + 2, y + 5, clrBlack, defaultFont, "Click Power");
+        if (!maxed) {
+            this->Draw();
+            DisplayText(x + 2, y + 5, clrBlack, defaultFont, "Click Power");
+        } else {
+            this->DrawMaxed();
+            DisplayText(x + 2, y + 5, clrBlack, defaultFont, "Click Power");
+        }
     }
 
     void OnClick() {
@@ -144,6 +149,8 @@ public:
             clicks.amount -= price;
             clicks.power += 1;
             owned++;
+            if (owned == 29)
+                maxed = true;
             price = baseCost * powf(multiplier, owned);
         }
     }
