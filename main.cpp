@@ -18,6 +18,7 @@ GLfloat clrGreen[3] = {0.713, 0.843, 0.658};
 class Clicks {
 public:
     float amount = 0;
+    int power = 1;
     float perSec = 0;
 };
 Clicks clicks;
@@ -52,12 +53,12 @@ public:
     float multiplier = 1.07;
     int owned = 0;
     float price;
+    bool maxed = false;
 
     float x;
     float y;
     float w;
     float h;
-    GLfloat color[3];
 
     void Draw() {
         glColor3fv(clrCream);
@@ -72,18 +73,24 @@ public:
             glVertex2f(x + w, y + h);
             glVertex2f(x + w, y);
         glEnd();
-        DisplayText(x + 2, y + 5, clrBlack, defaultFont, "Auto Click");
         DisplayText(x + w - 10, y + 5, clrBlack, defaultFont, ConvertToChar((int)price));
         DisplayText(x + w + 2, y + 5, clrCream, defaultFont, ConvertToChar(owned));
     }
 
-    void OnClick() {
-        if (price <= clicks.amount) {
-            clicks.amount -= price;
-            clicks.perSec += 0.2;
-            owned++;
-            price = baseCost * powf(multiplier, owned);
-        }
+    void DrawMaxed() {
+        glColor3fv(clrGreen);
+        glBegin(GL_QUADS);
+            glVertex2f(x + w, y);
+            glVertex2f(x + w, y + h);
+            glVertex2f(x, y + h);
+            glVertex2f(x, y);
+        glColor3fv(clrBlack);
+            glVertex2f(x + w + 10, y);
+            glVertex2f(x + w + 10, y + h);
+            glVertex2f(x + w, y + h);
+            glVertex2f(x + w, y);
+        glEnd();
+        DisplayText(x + w + 1.5, y + 5, clrCream, defaultFont, "MAX");
     }
 
     UpgradeButton(int upgradeCost, float _x, float _y, float width, float height) {
@@ -95,7 +102,56 @@ public:
         h = height;
     }
 };
-UpgradeButton btnAutoClicks(10, 50, 20, 35, 8);
+
+class AutoClicksButton : public UpgradeButton {
+public:
+    void Display() {
+        if (!maxed) {
+            this->Draw();
+            DisplayText(x + 2, y + 5, clrBlack, defaultFont, "Autoclick");
+        } else {
+            this->DrawMaxed();
+            DisplayText(x + 2, y + 5, clrBlack, defaultFont, "Autoclick");
+        }
+    }
+
+    void OnClick() {
+        if (price <= clicks.amount && !maxed) {
+            clicks.amount -= price;
+            clicks.perSec += 3;
+            owned++;
+            if (owned == 50)
+                maxed = true;
+            price = baseCost * powf(multiplier, owned);
+        }
+    }
+
+    AutoClicksButton(int upgradeCost, float _x, float _y, float width, float height)
+        : UpgradeButton(upgradeCost, _x, _y, width, height) {};
+};
+AutoClicksButton btnAutoClicks(40, 50, 20, 35, 8);
+
+class ClickPowerButton : public UpgradeButton {
+public:
+    // float multiplier = 1.09;
+    void Display() {
+        this->Draw();
+        DisplayText(x + 2, y + 5, clrBlack, defaultFont, "Click Power");
+    }
+
+    void OnClick() {
+        if (price <= clicks.amount && !maxed) {
+            clicks.amount -= price;
+            clicks.power += 1;
+            owned++;
+            price = baseCost * powf(multiplier, owned);
+        }
+    }
+
+    ClickPowerButton(int upgradeCost, float _x, float _y, float width, float height)
+        : UpgradeButton(upgradeCost, _x, _y, width, height) {};
+};
+ClickPowerButton btnClickPower(100, 50, 33, 35, 8);
 
 class UI {
 public:
@@ -116,15 +172,37 @@ public:
         glEnd();
         glPopMatrix();
 
-        btnAutoClicks.Draw();
+        btnAutoClicks.Display();
+        btnClickPower.Display();
         DisplayClickCount();
+        DisplayClickPower();
         DisplayClicksPerSec();
     }
 
-    void DisplayClicksPerSec() // отрисовка номера уровня
-    {
-        DisplayText(5, 7, clrWhite, defaultFont, "PASSIVE CLICKS:");
-        DisplayText(35, 7, clrGreen, defaultFont, ConvertToChar(clicks.perSec));
+    void DisplayClicksPerSec() {
+        DisplayText(3, 7, clrWhite, defaultFont, "PER SEC:");
+        DisplayText(20, 7, clrGreen, defaultFont, ConvertToChar(clicks.perSec));
+    }
+
+    void DisplayClickPower() {
+        DisplayText(36, 7, clrWhite, defaultFont, "CLICK POWER:");
+        DisplayText(61, 7, clrGreen, defaultFont, ConvertToChar(clicks.power));
+    }
+
+    void DisplayClickCount() {
+        DisplayText(73, 7, clrWhite, defaultFont, "CLICKS:");
+        DisplayText(88, 7, clrGreen, defaultFont, ConvertToChar((int)clicks.amount));
+    }
+
+    // TODO: Меню при входе в игру (вы заработали...)
+    void drawIntro() {
+        DisplayText(35, 50, clrCream, GLUT_BITMAP_TIMES_ROMAN_24, "CLICK TO START");
+        DisplayText(10, 85, clrWhite, GLUT_BITMAP_HELVETICA_12, "Made by Artem Maevski");
+        DisplayText(10, 90, clrWhite, GLUT_BITMAP_HELVETICA_12, "Dec 2021");
+    }
+
+    void drawPause() {
+        DisplayText(27, 50, clrGreen, GLUT_BITMAP_9_BY_15, "ARE YOU SURE YOU WANT TO EXIT?");
     }
 
     void drawDarkOverlay() {
@@ -135,23 +213,6 @@ public:
             glVertex2i(100, 100);
             glVertex2i(100, 0);
         glEnd();
-    }
-
-    void DisplayClickCount() {
-        DisplayText(70, 7, clrWhite, defaultFont, "CLICKS:");
-        DisplayText(85, 7, clrGreen, defaultFont, ConvertToChar(clicks.amount));
-    }
-
-    // TODO: Меню при входе в игру (вы заработали...)
-    void drawIntro() {
-        DisplayText(33, 50, clrBlack, GLUT_BITMAP_TIMES_ROMAN_24, "PRESS ENTER TO START");
-        DisplayText(10, 80, clrWhite, GLUT_BITMAP_HELVETICA_12, "Made by Alexander Tatchin");
-        DisplayText(10, 85, clrWhite, GLUT_BITMAP_HELVETICA_12, "Implemented via Visual C++ / Freeglut OPEN_GL");
-        DisplayText(10, 90, clrWhite, GLUT_BITMAP_HELVETICA_12, "Feb 2015");
-    }
-
-    void drawPause() {
-        DisplayText(27, 50, clrGreen, GLUT_BITMAP_9_BY_15, "ARE YOU SURE YOU WANT TO EXIT?");
     }
 };
 UI ui;
@@ -164,10 +225,10 @@ public:
     void Draw() {
         glBegin(GL_QUADS);
         glColor3fv(clrGreen);
-            glVertex2f(x + size, y       );
+            glVertex2f(x + size, y);
             glVertex2f(x + size, y + size);
-            glVertex2f(x       , y + size);
-            glVertex2f(x       , y       );
+            glVertex2f(x, y + size);
+            glVertex2f(x, y);
         glEnd();
     }
     void Animate() {
@@ -275,7 +336,7 @@ void ProcessKeyPress(unsigned char key, int x, int y) {
     // Spacebar
     case 32:
         if (director.gameState == 2) {
-            clicks.amount++;
+            clicks.amount += clicks.power;;
             glutPostRedisplay();
         }
         break;
@@ -300,11 +361,15 @@ void ProcessMousePress(int button, int state, int x, int y) {
             // Главный объект
             if (IsClickedInsideObject(x, y, MouseObj.x, MouseObj.y, MouseObj.size, MouseObj.size)) {
                 MouseObj.Animate();
-                clicks.amount++;
+                clicks.amount += clicks.power;
             }
-            // BtnAutoClicks
+            // Autoclicks
             if (IsClickedInsideObject(x, y, btnAutoClicks.x, btnAutoClicks.y, btnAutoClicks.w, btnAutoClicks.h)) {
                 btnAutoClicks.OnClick();
+            }
+            // Click Power
+            if (IsClickedInsideObject(x, y, btnClickPower.x, btnClickPower.y, btnClickPower.w, btnClickPower.h)) {
+                btnClickPower.OnClick();
             }
             break;
         }
