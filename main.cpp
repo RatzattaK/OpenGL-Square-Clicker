@@ -50,7 +50,7 @@ void DisplayText(float _x, float _y, const GLfloat *v, void *font, const char *_
 class UpgradeButton {
 public:
     int baseCost;
-    float multiplier = 1.07;
+    float multiplier = 1.15;
     int owned = 0;
     float price;
     bool maxed = false;
@@ -133,7 +133,7 @@ AutoClicksButton btnAutoClicks(40, 50, 20, 35, 8);
 
 class ClickPowerButton : public UpgradeButton {
 public:
-    float multiplier = 1.12;
+    float multiplier = 1.3;
     void Display() {
         if (!maxed) {
             this->Draw();
