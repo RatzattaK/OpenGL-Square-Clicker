@@ -337,18 +337,6 @@ void DisplayScene() {
     glutSwapBuffers();
 }
 
-// Настройка матрицы проекции перед отображением окна (Корректное соотношение сторон)
-void WindowResize(GLsizei  w, GLsizei  h) { // GLsizei - non-negative integer
-    if (h == 0)                  // To prevent divide by 0
-        h = 1;
-    GLfloat aspectRatio = (GLfloat)w / (GLfloat)h;
-    glViewport(0, 0, w, h);      // Set the viewport to cover the window
-    glMatrixMode(GL_PROJECTION); // To operate on the Projection matrix
-    glLoadIdentity();            // Reset the projection matrix
-
-    glOrtho(-aspectRatio, aspectRatio, -1, 1, -1, 1);
-}
-
 void ProcessKeyPress(unsigned char key, int x, int y) {
     switch (key)
     {
@@ -418,6 +406,18 @@ void TimerFunc(int) {
     clicks.amount += clicks.perSec;
     glutPostRedisplay();
     glutTimerFunc(1000, TimerFunc, 1);
+}
+
+// Настройка матрицы проекции перед отображением окна (Корректное соотношение сторон)
+void WindowResize(GLsizei  w, GLsizei  h) { // GLsizei - non-negative integer
+    if (h == 0)                  // To prevent divide by 0
+        h = 1;
+    GLfloat aspectRatio = (GLfloat)w / (GLfloat)h;
+    glViewport(0, 0, w, h);      // Set the viewport to cover the window
+    glMatrixMode(GL_PROJECTION); // To operate on the Projection matrix
+    glLoadIdentity();            // Reset the projection matrix
+
+    glOrtho(-aspectRatio, aspectRatio, -1, 1, -1, 1);
 }
 
 int main(int argc, char **argv) {
