@@ -193,6 +193,21 @@ PowerMultiplierButton btnPowerMultiplier(1000, 50, 46, 35, 8);
 
 class UI {
 public:
+    void DisplayClicksPerSec() {
+        DisplayText(3, 7, clrWhite, defaultFont, "PER SEC:");
+        DisplayText(20, 7, clrGreen, defaultFont, ConvertToChar(clicks.perSec));
+    }
+
+    void DisplayClickPower() {
+        DisplayText(36, 7, clrWhite, defaultFont, "CLICK POWER:");
+        DisplayText(61, 7, clrGreen, defaultFont, ConvertToChar(clicks.power));
+    }
+
+    void DisplayClickCount() {
+        DisplayText(73, 7, clrWhite, defaultFont, "CLICKS:");
+        DisplayText(88, 7, clrGreen, defaultFont, ConvertToChar((int)clicks.amount));
+    }
+
     void DrawHUD() {
         // Lines
         glPushMatrix();
@@ -218,29 +233,10 @@ public:
         DisplayClicksPerSec();
     }
 
-    void DisplayClicksPerSec() {
-        DisplayText(3, 7, clrWhite, defaultFont, "PER SEC:");
-        DisplayText(20, 7, clrGreen, defaultFont, ConvertToChar(clicks.perSec));
-    }
-
-    void DisplayClickPower() {
-        DisplayText(36, 7, clrWhite, defaultFont, "CLICK POWER:");
-        DisplayText(61, 7, clrGreen, defaultFont, ConvertToChar(clicks.power));
-    }
-
-    void DisplayClickCount() {
-        DisplayText(73, 7, clrWhite, defaultFont, "CLICKS:");
-        DisplayText(88, 7, clrGreen, defaultFont, ConvertToChar((int)clicks.amount));
-    }
-
     void DrawIntro() {
         DisplayText(35, 50, clrCream, GLUT_BITMAP_TIMES_ROMAN_24, "CLICK TO START");
         DisplayText(10, 85, clrWhite, GLUT_BITMAP_HELVETICA_12, "Made by Artem Maevski");
         DisplayText(10, 90, clrWhite, GLUT_BITMAP_HELVETICA_12, "Dec 2021");
-    }
-
-    void DrawPause() {
-        DisplayText(23, 50, clrWhite, GLUT_BITMAP_HELVETICA_18, "ARE YOU SURE YOU WANT TO EXIT?");
     }
 
     void DrawDarkOverlay() {
@@ -251,6 +247,11 @@ public:
             glVertex2i(100, 100);
             glVertex2i(100, 0);
         glEnd();
+    }
+
+    void DrawPause() {
+        DrawDarkOverlay();
+        DisplayText(23, 50, clrWhite, GLUT_BITMAP_HELVETICA_18, "ARE YOU SURE YOU WANT TO EXIT?");
     }
 
     void DrawEnd() {
@@ -328,7 +329,6 @@ void DisplayScene() {
     // Режим паузы
     case 3:
         director.GameProcess(); // Игра продолжается на фоне
-        ui.DrawDarkOverlay();
         director.GamePause();
         break;
     case 4:
