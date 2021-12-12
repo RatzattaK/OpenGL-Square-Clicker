@@ -31,14 +31,6 @@ const char *ConvertToChar(int val) {
         return str.c_str();
 }
 
-// const char *ConvertToChar(float val) {
-//         stringstream sstream;
-//         sstream.precision(2);
-//         sstream << fixed << val;
-//         string str = sstream.str();
-//         return str.c_str();
-// }
-
 void DisplayText(float _x, float _y, const GLfloat *v, void *font, const char *_str) {
     glColor3fv(v);
     glRasterPos2f(_x, _y);
