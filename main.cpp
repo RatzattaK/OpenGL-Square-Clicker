@@ -233,7 +233,6 @@ public:
         DisplayText(88, 7, clrGreen, defaultFont, ConvertToChar((int)clicks.amount));
     }
 
-    // TODO: Меню при входе в игру (вы заработали...)
     void DrawIntro() {
         DisplayText(35, 50, clrCream, GLUT_BITMAP_TIMES_ROMAN_24, "CLICK TO START");
         DisplayText(10, 85, clrWhite, GLUT_BITMAP_HELVETICA_12, "Made by Artem Maevski");
@@ -241,11 +240,11 @@ public:
     }
 
     void DrawPause() {
-        DisplayText(27, 50, clrGreen, GLUT_BITMAP_9_BY_15, "ARE YOU SURE YOU WANT TO EXIT?");
+        DisplayText(23, 50, clrWhite, GLUT_BITMAP_HELVETICA_18, "ARE YOU SURE YOU WANT TO EXIT?");
     }
 
     void DrawDarkOverlay() {
-        glColor4f(0.0, 0.0, 0.0, 0.4);
+        glColor4f(0.0, 0.0, 0.0, 0.6);
         glBegin(GL_QUADS);
             glVertex2i(0, 0);
             glVertex2i(0, 100);
@@ -328,12 +327,11 @@ void DisplayScene() {
         break;
     // Режим паузы
     case 3:
-        director.GameProcess(); // Отрисовка фона игры
+        director.GameProcess(); // Игра продолжается на фоне
         ui.DrawDarkOverlay();
         director.GamePause();
         break;
     case 4:
-        // glutTimerFunc(0, NULL, 0);
         director.EndGame();
         break;
     default:
