@@ -19,6 +19,7 @@ class Clicks {
 public:
     float amount = 0;
     int power = 1;
+    int powerMultiplier = 1;
     float perSec = 0;
 };
 Clicks clicks;
@@ -160,6 +161,36 @@ public:
 };
 ClickPowerButton btnClickPower(100, 50, 33, 35, 8);
 
+class PowerMultiplierButton : public UpgradeButton {
+public:
+    float multiplier = 3;
+
+    void Display() {
+        if (!maxed) {
+            this->Draw();
+            DisplayText(x + 2, y + 5, clrBlack, defaultFont, "Power Multiplier");
+        } else {
+            this->DrawMaxed();
+            DisplayText(x + 2, y + 5, clrBlack, defaultFont, "Power Multiplier");
+        }
+    }
+
+    void OnClick() {
+        if (price <= clicks.amount && !maxed) {
+            clicks.amount -= price;
+            clicks.powerMultiplier += 1;
+            owned++;
+            if (owned == 2)
+                maxed = true;
+            price = baseCost * powf(multiplier, owned);
+        }
+    }
+
+    PowerMultiplierButton(int upgradeCost, float _x, float _y, float width, float height)
+        : UpgradeButton(upgradeCost, _x, _y, width, height) {};
+};
+PowerMultiplierButton btnPowerMultiplier(1000, 50, 46, 35, 8);
+
 class UI {
 public:
     void DrawHUD() {
@@ -181,6 +212,7 @@ public:
 
         btnAutoClicks.Display();
         btnClickPower.Display();
+        btnPowerMultiplier.Display();
         DisplayClickCount();
         DisplayClickPower();
         DisplayClicksPerSec();
@@ -202,17 +234,17 @@ public:
     }
 
     // TODO: Меню при входе в игру (вы заработали...)
-    void drawIntro() {
+    void DrawIntro() {
         DisplayText(35, 50, clrCream, GLUT_BITMAP_TIMES_ROMAN_24, "CLICK TO START");
         DisplayText(10, 85, clrWhite, GLUT_BITMAP_HELVETICA_12, "Made by Artem Maevski");
         DisplayText(10, 90, clrWhite, GLUT_BITMAP_HELVETICA_12, "Dec 2021");
     }
 
-    void drawPause() {
+    void DrawPause() {
         DisplayText(27, 50, clrGreen, GLUT_BITMAP_9_BY_15, "ARE YOU SURE YOU WANT TO EXIT?");
     }
 
-    void drawDarkOverlay() {
+    void DrawDarkOverlay() {
         glColor4f(0.0, 0.0, 0.0, 0.4);
         glBegin(GL_QUADS);
             glVertex2i(0, 0);
@@ -221,10 +253,16 @@ public:
             glVertex2i(100, 0);
         glEnd();
     }
+
+    void DrawEnd() {
+        DrawDarkOverlay();
+        DisplayText(39, 45, clrGreen, GLUT_BITMAP_9_BY_15, "CONGRATULATIONS!");
+        DisplayText(32, 50, clrGreen, GLUT_BITMAP_9_BY_15, "You've reached 50k points");
+    }
 };
 UI ui;
 
-class ObjMouse {
+class ObjSquare {
 public:
     float x = 15;
     float y = 40;
@@ -249,27 +287,29 @@ public:
         glutSwapBuffers();
     }
 };
-
-ObjMouse MouseObj;
+ObjSquare SquareObj;
 
 class GameDirector {
 public:
     int gameState = 1;
 
     void StartScreen() {
-        ui.drawIntro();
+        ui.DrawIntro();
     }
 
     void GameProcess() {
         ui.DrawHUD();
-        MouseObj.Draw();
+        SquareObj.Draw();
     }
 
     void GamePause() {
-        ui.drawPause();
+        ui.DrawPause();
+    }
+
+    void EndGame() {
+        ui.DrawEnd();
     }
 };
-
 GameDirector director;
 
 void DisplayScene() {
@@ -289,12 +329,20 @@ void DisplayScene() {
     // Режим паузы
     case 3:
         director.GameProcess(); // Отрисовка фона игры
-        ui.drawDarkOverlay();
+        ui.DrawDarkOverlay();
         director.GamePause();
+        break;
+    case 4:
+        // glutTimerFunc(0, NULL, 0);
+        director.EndGame();
         break;
     default:
         return;
     }
+
+    if(clicks.amount >= 50000)
+        director.gameState = 4;
+
     // Смена буферов для отрисовки
     glutSwapBuffers();
 }
@@ -308,13 +356,7 @@ void WindowResize(GLsizei  w, GLsizei  h) { // GLsizei - non-negative integer
     glMatrixMode(GL_PROJECTION); // To operate on the Projection matrix
     glLoadIdentity();            // Reset the projection matrix
 
-    if (w >= h) {
-        // If larger width
-        glOrtho(-aspectRatio, aspectRatio, -1, 1, -1, 1);
-    } else {
-        // If larger height
-        glOrtho(-1, 1, -1 / aspectRatio, 1 / aspectRatio, -1, 1);
-    }
+    glOrtho(-aspectRatio, aspectRatio, -1, 1, -1, 1);
 }
 
 void ProcessKeyPress(unsigned char key, int x, int y) {
@@ -333,17 +375,13 @@ void ProcessKeyPress(unsigned char key, int x, int y) {
         break;
     // Enter
     case 13:
-        if (director.gameState == 1) {
-            director.gameState = 2;
-            glutPostRedisplay();
-        }
-        if (director.gameState == 3)
+        if (director.gameState == 3 || director.gameState == 4)
             exit(EXIT_SUCCESS);
         break;
     // Spacebar
     case 32:
         if (director.gameState == 2) {
-            clicks.amount += clicks.power;;
+            clicks.amount += clicks.power * clicks.powerMultiplier;
             glutPostRedisplay();
         }
         break;
@@ -366,9 +404,9 @@ void ProcessMousePress(int button, int state, int x, int y) {
             break;
         case 2:
             // Главный объект
-            if (IsClickedInsideObject(x, y, MouseObj.x, MouseObj.y, MouseObj.size, MouseObj.size)) {
-                MouseObj.Animate();
-                clicks.amount += clicks.power;
+            if (IsClickedInsideObject(x, y, SquareObj.x, SquareObj.y, SquareObj.size, SquareObj.size)) {
+                SquareObj.Animate();
+                clicks.amount += clicks.power * clicks.powerMultiplier;
             }
             // Autoclicks
             if (IsClickedInsideObject(x, y, btnAutoClicks.x, btnAutoClicks.y, btnAutoClicks.w, btnAutoClicks.h)) {
@@ -377,6 +415,9 @@ void ProcessMousePress(int button, int state, int x, int y) {
             // Click Power
             if (IsClickedInsideObject(x, y, btnClickPower.x, btnClickPower.y, btnClickPower.w, btnClickPower.h)) {
                 btnClickPower.OnClick();
+            }
+            if (IsClickedInsideObject(x, y, btnPowerMultiplier.x, btnPowerMultiplier.y, btnPowerMultiplier.w, btnPowerMultiplier.h)) {
+                btnPowerMultiplier.OnClick();
             }
             break;
         }
@@ -397,13 +438,12 @@ int main(int argc, char **argv) {
     // Создание окна
 	glutInitWindowPosition(400, 100);
 	glutInitWindowSize(windowWidth, windowHeight);
-	glutCreateWindow("Mouse Clicker");
-    // glutFullScreen();
+	glutCreateWindow("Square Clicker");
 
-    glOrtho(0.0, 100, 100, 0, -1.0, 1.0);
 
     // Отображение
     glutDisplayFunc(DisplayScene);
+    glOrtho(0.0, 100, 100, 0, -1.0, 1.0);
     TimerFunc(0);
     // Изменение размера окна
     glutReshapeFunc(WindowResize);
