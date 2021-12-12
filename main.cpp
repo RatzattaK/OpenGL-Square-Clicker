@@ -17,10 +17,10 @@ GLfloat clrGreen[3] = {0.713, 0.843, 0.658};
 
 class Clicks {
 public:
-    float amount = 0;
+    int amount = 0;
     int power = 1;
     int powerMultiplier = 1;
-    float perSec = 0;
+    int perSec = 0;
 };
 Clicks clicks;
 
@@ -31,13 +31,13 @@ const char *ConvertToChar(int val) {
         return str.c_str();
 }
 
-const char *ConvertToChar(float val) {
-        stringstream sstream;
-        sstream.precision(2);
-        sstream << fixed << val;
-        string str = sstream.str();
-        return str.c_str();
-}
+// const char *ConvertToChar(float val) {
+//         stringstream sstream;
+//         sstream.precision(2);
+//         sstream << fixed << val;
+//         string str = sstream.str();
+//         return str.c_str();
+// }
 
 void DisplayText(float _x, float _y, const GLfloat *v, void *font, const char *_str) {
     glColor3fv(v);
