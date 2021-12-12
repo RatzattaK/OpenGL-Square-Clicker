@@ -394,6 +394,7 @@ void ProcessMousePress(int button, int state, int x, int y) {
             if (IsClickedInsideObject(x, y, btnClickPower.x, btnClickPower.y, btnClickPower.w, btnClickPower.h)) {
                 btnClickPower.OnClick();
             }
+            // Power Multiplier
             if (IsClickedInsideObject(x, y, btnPowerMultiplier.x, btnPowerMultiplier.y, btnPowerMultiplier.w, btnPowerMultiplier.h)) {
                 btnPowerMultiplier.OnClick();
             }
@@ -429,7 +430,6 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition(400, 100);
 	glutInitWindowSize(windowWidth, windowHeight);
 	glutCreateWindow("Square Clicker");
-
 
     // Отображение
     glutDisplayFunc(DisplayScene);
