@@ -2,6 +2,8 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 using namespace std;
 
 int windowWidth  = 600;
@@ -14,6 +16,11 @@ GLfloat clrAqua[3] = {0.407, 0.53, 0.53};
 GLfloat clrWhite[3] = {1.0, 1.0, 1.0};
 GLfloat clrBlack[3] = {0.0, 0.0, 0.0};
 GLfloat clrGreen[3] = {0.713, 0.843, 0.658};
+
+int level = 1;
+
+int width, height, nrChannels;
+unsigned char *data;
 
 class Clicks {
 public:
@@ -254,24 +261,118 @@ public:
 };
 UI ui;
 
+void DrawBG();
+
 class ObjSquare {
 public:
     float x = 15;
     float y = 40;
     float size = 20;
     void Draw() {
-        glBegin(GL_QUADS);
-        glColor3fv(clrGreen);
-            glVertex2f(x + size, y);
-            glVertex2f(x + size, y + size);
-            glVertex2f(x, y + size);
-            glVertex2f(x, y);
-        glEnd();
+        switch (level)
+        {
+        case 1:
+            glEnable(GL_TEXTURE_2D);
+            static GLuint txDirt;
+            glBindTexture(GL_TEXTURE_2D, txDirt);
+
+            data = stbi_load("1.png", &width, &height, &nrChannels, 0);
+
+            if (data) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+                stbi_image_free(data);
+            }
+            glBegin(GL_QUADS);
+            glTexCoord2f(0.0, 0.0); glVertex2f(x + size, y);
+            glTexCoord2f(0.0, 1.0); glVertex2f(x + size, y + size);
+            glTexCoord2f(1.0, 1.0); glVertex2f(x, y + size);
+            glTexCoord2f(1.0, 0.0); glVertex2f(x, y);
+            glEnd();
+            glDisable(GL_TEXTURE_2D);
+            break;
+        case 2:
+            glEnable(GL_TEXTURE_2D);
+            static GLuint txWood;
+            glBindTexture(GL_TEXTURE_2D, txWood);
+
+            data = stbi_load("2.png", &width, &height, &nrChannels, 0);
+
+            if (data) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+                stbi_image_free(data);
+            }
+            glBegin(GL_QUADS);
+            glTexCoord2f(0.0, 0.0); glVertex2f(x + size, y);
+            glTexCoord2f(0.0, 1.0); glVertex2f(x + size, y + size);
+            glTexCoord2f(1.0, 1.0); glVertex2f(x, y + size);
+            glTexCoord2f(1.0, 0.0); glVertex2f(x, y);
+            glEnd();
+            glDisable(GL_TEXTURE_2D);
+            break;
+        case 3:
+            glEnable(GL_TEXTURE_2D);
+            static GLuint txIron;
+            glBindTexture(GL_TEXTURE_2D, txIron);
+
+            data = stbi_load("3.png", &width, &height, &nrChannels, 0);
+
+            if (data) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+                stbi_image_free(data);
+            }
+            glBegin(GL_QUADS);
+            glTexCoord2f(0.0, 0.0); glVertex2f(x + size, y);
+            glTexCoord2f(0.0, 1.0); glVertex2f(x + size, y + size);
+            glTexCoord2f(1.0, 1.0); glVertex2f(x, y + size);
+            glTexCoord2f(1.0, 0.0); glVertex2f(x, y);
+            glEnd();
+            glDisable(GL_TEXTURE_2D);
+            break;
+        case 4:
+            glEnable(GL_TEXTURE_2D);
+            static GLuint txGold;
+            glBindTexture(GL_TEXTURE_2D, txGold);
+
+            data = stbi_load("4.png", &width, &height, &nrChannels, 0);
+
+            if (data) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+                stbi_image_free(data);
+            }
+            glBegin(GL_QUADS);
+            glTexCoord2f(0.0, 0.0); glVertex2f(x + size, y);
+            glTexCoord2f(0.0, 1.0); glVertex2f(x + size, y + size);
+            glTexCoord2f(1.0, 1.0); glVertex2f(x, y + size);
+            glTexCoord2f(1.0, 0.0); glVertex2f(x, y);
+            glEnd();
+            glDisable(GL_TEXTURE_2D);
+            break;
+        case 5:
+            glEnable(GL_TEXTURE_2D);
+            static GLuint txDiamond;
+            glBindTexture(GL_TEXTURE_2D, txDiamond);
+
+            data = stbi_load("5.png", &width, &height, &nrChannels, 0);
+
+            if (data) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+                stbi_image_free(data);
+            }
+            glBegin(GL_QUADS);
+            glTexCoord2f(0.0, 0.0); glVertex2f(x + size, y);
+            glTexCoord2f(0.0, 1.0); glVertex2f(x + size, y + size);
+            glTexCoord2f(1.0, 1.0); glVertex2f(x, y + size);
+            glTexCoord2f(1.0, 0.0); glVertex2f(x, y);
+            glEnd();
+            glDisable(GL_TEXTURE_2D);
+            break;
+        }
     }
     void Animate() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glPushMatrix();
+        DrawBG();
         ui.DrawHUD();
         glTranslatef(0.0, 0.02, 0.0);
         this->Draw();
@@ -304,10 +405,30 @@ public:
 };
 GameDirector director;
 
-void DisplayScene() {
-    glClearColor(0.407, 0.53, 0.53, 1.0); // Основной цвет фона
-    glClear(GL_COLOR_BUFFER_BIT);
+void DrawBG() {
+    glEnable(GL_TEXTURE_2D);
+    static GLuint txCin;
+    glBindTexture(GL_TEXTURE_2D, txCin);
 
+    data = stbi_load("bg.png", &width, &height, &nrChannels, 0);
+
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    }
+    stbi_image_free(data);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0); glVertex2f(100, 0);
+    glTexCoord2f(0.0, 1.0); glVertex2f(100, 100);
+    glTexCoord2f(1.0, 1.0); glVertex2f(0, 100);
+    glTexCoord2f(1.0, 0.0); glVertex2f(0, 0);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+}
+
+void DisplayScene() {
+    // glClearColor(0.407, 0.53, 0.53, 1.0); // Основной цвет фона
+    glClear(GL_COLOR_BUFFER_BIT);
+    DrawBG();
     switch (director.gameState)
     {
     // Начальный экран
@@ -328,6 +449,16 @@ void DisplayScene() {
         break;
     default:
         return;
+    }
+
+    if(clicks.amount >= 25000 && level == 4) {
+        level = 5;
+    } else if (clicks.amount >= 10000 && level == 3) {
+        level = 4;
+    } else if (clicks.amount >= 5000 && level == 2) {
+        level = 3;
+    } else if (clicks.amount >= 1000 && level == 1) {
+        level = 2;
     }
 
     if(clicks.amount >= 50000)
@@ -435,6 +566,15 @@ int main(int argc, char **argv) {
     glutDisplayFunc(DisplayScene);
     glOrtho(0.0, 100, 100, 0, -1.0, 1.0);
     TimerFunc(0);
+
+    // Texture
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
     // Изменение размера окна
     glutReshapeFunc(WindowResize);
 
