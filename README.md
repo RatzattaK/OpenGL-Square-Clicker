@@ -10,6 +10,6 @@ This is a clicker game where you need to reach 50k points to win. There're 3 upg
 ![](/Preview.png?raw=true "Preview of the game.")
 
 ## Crucial Information
-To run the application you must have the `freeglut.dll` next to you .exe file. This project makes use of `opengl` and `freeglut` libraries (also `freeglut.h` header), so don't forget to include them if you're not using VSCode. For more info check the [tasks.json](/.vscode/tasks.json) file.
+To run the application you must have the `freeglut.dll` next to you .exe file. This project makes use of `opengl` and `freeglut` libraries (also `freeglut.h` header), so don't forget to include them.
 
 There are 5 .png\`s for Square "skins" and one background image. You can change them to whatever you prefer, but it's strongly adviced NOT to use images bigger than 512x512 pixels.
