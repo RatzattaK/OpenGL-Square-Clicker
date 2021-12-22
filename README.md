@@ -1,4 +1,4 @@
-# OpenGL Clicker
+# Square Clicker
 Course work project. C++ OpenGL clicker made with freeglut.
 
 ## Credits
